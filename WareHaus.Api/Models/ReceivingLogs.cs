@@ -1,0 +1,13 @@
+using System;
+
+namespace WareHaus.Api.Models;
+
+public class ReceivingLogs : BaseEntities
+{
+    public Guid POItemId { get; set; }
+    public int QtyReceived { get; set; }
+    public string Condition { get; set; } = string.Empty;
+    public DateTime ReceivedAt { get; set; }
+    public DateTime ExpiryDate { get; set; }
+    public POItems? POItems { get; set; }
+}
