@@ -6,6 +6,8 @@ public class Shelf : BaseEntity
 
     public string ShelfCode { get; set; } = string.Empty;
 
+    public int Aisle { get; set; }
+
     public int Capacity { get; set; }
 
     public int CurrentVolume { get; set; }

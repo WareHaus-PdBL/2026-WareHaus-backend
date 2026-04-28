@@ -12,7 +12,7 @@ public class Zone : BaseEntity
 
     public int ShelfPerAisle { get; set; }
 
-    public int LevelPerShelf { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     public ICollection<Shelf> Shelves { get; set; } = new List<Shelf>();
 }
