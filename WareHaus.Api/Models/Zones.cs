@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace WareHaus.Api.Models;
 
@@ -11,4 +12,6 @@ public class Zones : BaseEntities
     public int TotalAisle { get; set; }
     public int ShelfPerAisle { get; set; }
     public int LevelPerShelf { get; set; }
+    
+    public ICollection<Shelves> Shelves { get; set; } = new List<Shelves>();
 }

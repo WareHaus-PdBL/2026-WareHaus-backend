@@ -11,7 +11,6 @@ public class InboundsController : ControllerBase
 {
     private readonly InboundServices _inboundServices;
 
-
     public InboundsController(InboundServices inboundServices)
     {
         _inboundServices = inboundServices;

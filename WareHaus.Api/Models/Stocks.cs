@@ -9,4 +9,5 @@ public class Stocks : BaseEntities
     public int Quantity { get; set; }
     
     public Shelves? Shelves { get; set; }
+    public Products? Products { get; set; }
 }

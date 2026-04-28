@@ -14,4 +14,4 @@ public class AppDbContext : DbContext
     public DbSet<Zones> Zones { get; set; }
     public DbSet<Shelves> Shelves { get; set; }
     public DbSet<Stocks> Stocks { get; set; }
-} 
+}
