@@ -8,7 +8,7 @@ public class Stock
 
     public int Quantity { get; set; }
 
-    public Shelf? Shelf { get; set; }
+    public Shelf Shelf { get; set; } = null!;
 
-    public Product? Product { get; set; }
+    public Product Product { get; set; } = null!;
 }

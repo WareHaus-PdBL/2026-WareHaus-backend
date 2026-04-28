@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WareHaus.API.Data;
 
@@ -11,9 +12,11 @@ using WareHaus.API.Data;
 namespace WareHaus.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260428173502_InitialMySql")]
+    partial class InitialMySql
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,11 +35,13 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("AisleCode")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("AisleName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -52,9 +57,12 @@ namespace WareHaus.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AisleCode")
+                        .IsUnique();
+
                     b.HasIndex("ZoneId");
 
-                    b.ToTable("Aisles");
+                    b.ToTable("Aisles", (string)null);
                 });
 
             modelBuilder.Entity("WareHaus.API.Models.Product", b =>
@@ -82,13 +90,13 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("SKU")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("UnitOfMeasure")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -101,7 +109,7 @@ namespace WareHaus.Api.Migrations
                     b.HasIndex("SKU")
                         .IsUnique();
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("WareHaus.API.Models.Shelf", b =>
@@ -164,7 +172,7 @@ namespace WareHaus.Api.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Stocks");
+                    b.ToTable("Stocks", (string)null);
                 });
 
             modelBuilder.Entity("WareHaus.API.Models.Zone", b =>
@@ -185,10 +193,6 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("LevelPerShelf")
                         .HasColumnType("int");

@@ -6,6 +6,8 @@ public class Zone : BaseEntity
 
     public string ZoneName { get; set; } = string.Empty;
 
+    public string? Description { get; set; }
+
     public string Category { get; set; } = string.Empty;
 
     public int TotalAisle { get; set; }
@@ -14,5 +16,5 @@ public class Zone : BaseEntity
 
     public int LevelPerShelf { get; set; }
 
-    public ICollection<Shelf> Shelves { get; set; } = new List<Shelf>();
+    public ICollection<Aisle> Aisles { get; set; } = new List<Aisle>();
 }

@@ -6,28 +6,47 @@ namespace WareHaus.API.Configurations;
 
 public class ZoneConfiguration : IEntityTypeConfiguration<Zone>
 {
-    public void Configure(EntityTypeBuilder<Zone> builder)
+    public void Configure(EntityTypeBuilder<Zone> entity)
     {
-        builder.HasKey(zone => zone.Id);
+        entity.ToTable("Zones");
 
-        builder.HasIndex(zone => zone.ZoneCode)
+        entity.HasKey(e => e.Id);
+
+        entity.Property(e => e.ZoneCode)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        entity.Property(e => e.ZoneName)
+            .HasMaxLength(150)
+            .IsRequired();
+
+        entity.Property(e => e.Description)
+            .HasMaxLength(255);
+
+        entity.Property(e => e.Category)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        entity.Property(e => e.TotalAisle)
+            .IsRequired();
+
+        entity.Property(e => e.ShelfPerAisle)
+            .IsRequired();
+
+        entity.Property(e => e.LevelPerShelf)
+            .IsRequired();
+
+        entity.Property(e => e.CreatedAt)
+            .IsRequired();
+
+        entity.HasIndex(e => e.ZoneCode)
             .IsUnique();
 
-        builder.Property(zone => zone.ZoneCode)
-            .HasMaxLength(20)
-            .IsRequired();
-
-        builder.Property(zone => zone.ZoneName)
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(zone => zone.Category)
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.HasMany(zone => zone.Shelves)
-            .WithOne(shelf => shelf.Zone)
-            .HasForeignKey(shelf => shelf.ZoneId)
+        entity.HasMany(e => e.Aisles)
+            .WithOne(e => e.Zone)
+            .HasForeignKey(e => e.ZoneId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        entity.HasQueryFilter(e => e.DeletedAt == null);
     }
 }
