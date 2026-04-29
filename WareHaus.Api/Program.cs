@@ -1,19 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using WareHaus.API.Data;
-using WareHaus.Api;
 using WareHaus.Api.Services;
+using WareHaus.Api.Middleware;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+Env.Load();
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(); 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddScoped<InboundServices>();
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddScoped<PurchaseOrderService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
@@ -25,11 +28,10 @@ app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
 app.MapControllers();
-
 app.Run();
