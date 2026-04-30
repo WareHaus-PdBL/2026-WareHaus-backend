@@ -1,4 +1,4 @@
-namespace WareHaus.API.Models;
+namespace WareHaus.Api.Models;
 
 public class Shelf : BaseEntity
 {
@@ -12,7 +12,7 @@ public class Shelf : BaseEntity
 
     public int CurrentVolume { get; set; }
 
-    public string? QRCodePath { get; set; }
+    public string QRCodePath { get; set; } = string.Empty;
 
     public Zone? Zone { get; set; }
 

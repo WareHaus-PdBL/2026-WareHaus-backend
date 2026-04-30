@@ -1,4 +1,4 @@
-namespace WareHaus.API.Models;
+namespace WareHaus.Api.Models;
 
 public class Zone : BaseEntity
 {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WareHaus.Api.Data;
 
@@ -11,9 +12,11 @@ using WareHaus.Api.Data;
 namespace WareHaus.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260429133205_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace WareHaus.Api.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("WareHaus.Api.Models.Product", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,7 +73,7 @@ namespace WareHaus.Api.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Shelf", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Shelf", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,7 +122,7 @@ namespace WareHaus.Api.Migrations
                     b.ToTable("Shelves");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Stock", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Stock", b =>
                 {
                     b.Property<int>("ShelfId")
                         .HasColumnType("int");
@@ -127,20 +130,8 @@ namespace WareHaus.Api.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
 
                     b.HasKey("ShelfId", "ProductId");
 
@@ -149,7 +140,7 @@ namespace WareHaus.Api.Migrations
                     b.ToTable("Stocks");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Zone", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Zone", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -199,9 +190,9 @@ namespace WareHaus.Api.Migrations
                     b.ToTable("Zones");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Shelf", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Shelf", b =>
                 {
-                    b.HasOne("WareHaus.Api.Models.Zone", "Zone")
+                    b.HasOne("WareHaus.API.Models.Zone", "Zone")
                         .WithMany("Shelves")
                         .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -210,15 +201,15 @@ namespace WareHaus.Api.Migrations
                     b.Navigation("Zone");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Stock", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Stock", b =>
                 {
-                    b.HasOne("WareHaus.Api.Models.Product", "Product")
+                    b.HasOne("WareHaus.API.Models.Product", "Product")
                         .WithMany("Stocks")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WareHaus.Api.Models.Shelf", "Shelf")
+                    b.HasOne("WareHaus.API.Models.Shelf", "Shelf")
                         .WithMany("Stocks")
                         .HasForeignKey("ShelfId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -229,17 +220,17 @@ namespace WareHaus.Api.Migrations
                     b.Navigation("Shelf");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Product", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Product", b =>
                 {
                     b.Navigation("Stocks");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Shelf", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Shelf", b =>
                 {
                     b.Navigation("Stocks");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Zone", b =>
+            modelBuilder.Entity("WareHaus.API.Models.Zone", b =>
                 {
                     b.Navigation("Shelves");
                 });

@@ -1,6 +1,6 @@
-namespace WareHaus.API.Models;
+namespace WareHaus.Api.Models;
 
-public class Stock
+public class Stock : BaseEntity
 {
     public int ShelfId { get; set; }
 

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using WareHaus.API.Models;
+using WareHaus.Api.Models;
 
-namespace WareHaus.API.Data;
+namespace WareHaus.Api.Data;
 
 public class AppDbContext : DbContext
 {

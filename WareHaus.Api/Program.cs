@@ -1,32 +1,45 @@
 using Microsoft.EntityFrameworkCore;
-using WareHaus.API.Data;
+using WareHaus.Api.Data;
 using WareHaus.Api;
 using WareHaus.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddScoped<IZoneService, ZoneService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()));
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
-// Register application services
-builder.Services.AddScoped<IZoneService, ZoneService>();
-
 var app = builder.Build();
+
+app.UseStaticFiles();
+app.UseCors("AllowAll");
 
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
+    app.UseSwaggerUI();
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers();
 
 app.Run();

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WareHaus.API.Models;
+using WareHaus.Api.Models;
 
-namespace WareHaus.API.Configurations;
+namespace WareHaus.Api.Configurations;
 
 public class ShelfConfiguration : IEntityTypeConfiguration<Shelf>
 {

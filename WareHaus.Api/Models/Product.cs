@@ -1,4 +1,4 @@
-namespace WareHaus.API.Models;
+namespace WareHaus.Api.Models;
 
 public class Product : BaseEntity
 {
@@ -6,7 +6,7 @@ public class Product : BaseEntity
 
     public string ProductName { get; set; } = string.Empty;
 
-    public string? Barcode { get; set; }
+    public string Barcode { get; set; } = string.Empty;
 
     public string UnitOfMeasure { get; set; } = string.Empty;
 

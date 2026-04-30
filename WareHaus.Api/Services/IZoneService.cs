@@ -1,4 +1,4 @@
-using WareHaus.Api.DTOs.Zone;
+using WareHaus.Api.DTOs;
 
 namespace WareHaus.Api.Services;
 

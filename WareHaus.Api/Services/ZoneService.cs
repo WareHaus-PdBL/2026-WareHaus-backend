@@ -1,7 +1,6 @@
-using WareHaus.API.Data;
-using WareHaus.Api.DTOs.Zone;
-using WareHaus.Api.DTOs.Shelf;
-using WareHaus.API.Models;
+using WareHaus.Api.Data;
+using WareHaus.Api.DTOs;
+using WareHaus.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using SkiaSharp;
@@ -22,39 +21,38 @@ class ZoneService : IZoneService
     // Get All Zones
     public async Task<List<GetAllZonesDto>> GetAllZonesAsync()
     {
-        return await _context.Zones.Select(z => new GetAllZonesDto
-        {
-            Id = z.Id,
-            ZoneCode = z.ZoneCode,
-            ZoneName = z.ZoneName,
-            Category = z.Category,
-            TotalAisle = z.TotalAisle,
-            ShelfPerAisle = z.ShelfPerAisle
-        }).ToListAsync();
+        return await _context.Zones
+            .Select(z => new GetAllZonesDto(
+                z.Id,
+                z.ZoneCode,
+                z.ZoneName,
+                z.Category,
+                z.Description,
+                z.TotalAisle,
+                z.ShelfPerAisle))
+            .ToListAsync();
     }
 
     // Get Zone Details by Aisle
     public async Task<GetDetailsZoneDto> GetDetailsZoneAsync(int zoneId, int? aisle)
     {
         var zone = await _context.Zones.Where(z => z.Id == zoneId)
-            .Select(z => new GetDetailsZoneDto
-            {
-                Id = z.Id,
-                ZoneCode = z.ZoneCode,
-                ZoneName = z.ZoneName,
-                Category = z.Category,
-                TotalAisle = z.TotalAisle,
-                ShelfPerAisle = z.ShelfPerAisle,
-                Shelves = z.Shelves.Where(s => s.Aisle == aisle).Select(s => new GetShelfForZoneDto
-                {
-                    Id = s.Id,
-                    ShelfCode = s.ShelfCode,
-                    Aisle = s.Aisle,
-                    Capacity = s.Capacity,
-                    CurrentVolume = s.CurrentVolume,
-                    QRCodePath = s.QRCodePath ?? string.Empty
-                }).ToList()
-            }).FirstOrDefaultAsync();
+            .Select(z => new GetDetailsZoneDto(
+                z.Id,
+                z.ZoneCode,
+                z.ZoneName,
+                z.Category,
+                z.Description,
+                z.TotalAisle,
+                z.ShelfPerAisle,
+                z.Shelves.Where(s => s.Aisle == aisle).Select(s => new GetShelfForZoneDto(
+                    s.Id,
+                    s.ShelfCode,
+                    s.Aisle,
+                    s.Capacity,
+                    s.CurrentVolume,
+                    s.QRCodePath ?? string.Empty)).ToList()))
+            .FirstOrDefaultAsync();
 
         if (zone == null)
         {
@@ -102,14 +100,14 @@ class ZoneService : IZoneService
         await _context.SaveChangesAsync();
 
         return new GetAllZonesDto
-        {
-            Id = zone.Id,
-            ZoneCode = zone.ZoneCode,
-            ZoneName = zone.ZoneName,
-            Category = zone.Category,
-            TotalAisle = zone.TotalAisle,
-            ShelfPerAisle = zone.ShelfPerAisle
-        };
+            (
+                zone.Id,
+                zone.ZoneCode,
+                zone.ZoneName,
+                zone.Category,
+                zone.Description,
+                zone.TotalAisle,
+                zone.ShelfPerAisle);
     }
 
     // Update Zone
@@ -134,28 +132,34 @@ class ZoneService : IZoneService
         await _context.SaveChangesAsync();
 
         return new GetAllZonesDto
-        {
-            Id = zone.Id,
-            ZoneCode = zone.ZoneCode,
-            ZoneName = zone.ZoneName,
-            Category = zone.Category,
-            TotalAisle = zone.TotalAisle,
-            ShelfPerAisle = zone.ShelfPerAisle
-        };
+            (
+                zone.Id,
+                zone.ZoneCode,
+                zone.ZoneName,
+                zone.Category,
+                zone.Description,
+                zone.TotalAisle,
+                zone.ShelfPerAisle);
     }
 
     // Delete Zone
     public async Task DeleteZoneAsync(int zoneId)
     {
         var zone = await _context.Zones.Include(z => z.Shelves).FirstOrDefaultAsync(z => z.Id == zoneId);
+        if (zone == null)
+        {
+            throw new KeyNotFoundException("Zone Tidak ditemukan");
+        }
+
         if (zone.Shelves.Any(s => s.CurrentVolume > 0))
         {
             throw new InvalidOperationException("Tidak dapat menghapus zona yang masih memiliki barang di rak.");
         }
 
-        if (zone == null)
+        string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "qrcodes", zone.ZoneCode);
+        if (Directory.Exists(folderPath))
         {
-            throw new KeyNotFoundException("Zone Tidak ditemukan");
+            Directory.Delete(folderPath, true);
         }
 
         _context.Zones.Remove(zone);
@@ -194,17 +198,17 @@ class ZoneService : IZoneService
                     canvas.DrawBitmap(bitmap, 0, 0);
 
                     using (SKPaint paint = new SKPaint())
+                    using (SKFont font = new SKFont(
+                        SKTypeface.FromFamilyName("Arial", SKFontStyleWeight.Bold, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright),
+                        32))
                     {
                         paint.Color = SKColors.Black;
                         paint.IsAntialias = true;
-                        paint.TextSize = 32.0f;
-                        paint.TextAlign = SKTextAlign.Center;
-                        paint.Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyleWeight.Bold, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright);
 
                         float x = info.Width / 2;
                         float y = bitmap.Height + (textSpace / 2) + 10;
 
-                        canvas.DrawText(shelfCode, x, y, paint);
+                        canvas.DrawText(shelfCode, x, y, SKTextAlign.Center, font, paint);
                     }
 
                     using (SKImage image = surface.Snapshot())
@@ -216,7 +220,7 @@ class ZoneService : IZoneService
                 }
             }
 
-            return $"/qrcode/{zoneCode}/{fileName}"; // Placeholder, implementasi sebenarnya diperlukan
+            return $"/qrcodes/{zoneCode}/{fileName}";
         }
     }
 }

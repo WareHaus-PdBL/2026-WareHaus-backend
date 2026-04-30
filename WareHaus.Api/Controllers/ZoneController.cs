@@ -1,16 +1,15 @@
 
 using Microsoft.AspNetCore.Mvc;
-using WareHaus.Api.DTOs.Zone;
+using WareHaus.Api.DTOs;
 using WareHaus.Api.Services;
 
-namespace Backend.Controllers;
+namespace WareHaus.Api.Controllers;
 
 [ApiController]
 [Route("v1/[controller]")]
 public class ZoneController : ControllerBase
 {
     private readonly IZoneService _zoneService;
-
 
     public ZoneController(IZoneService zoneService)
     {
