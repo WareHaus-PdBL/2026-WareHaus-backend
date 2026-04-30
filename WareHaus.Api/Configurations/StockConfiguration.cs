@@ -4,9 +4,9 @@ using WareHaus.Api.Models;
 
 namespace WareHaus.Api.Configurations;
 
-public class StockConfiguration : IEntityTypeConfiguration<Stock>
+public class StockConfiguration : IEntityTypeConfiguration<Stocks>
 {
-    public void Configure(EntityTypeBuilder<Stock> builder)
+    public void Configure(EntityTypeBuilder<Stocks> builder)
     {
         builder.HasKey(stock => new
         {
@@ -17,12 +17,12 @@ public class StockConfiguration : IEntityTypeConfiguration<Stock>
         builder.Property(stock => stock.Quantity)
             .IsRequired();
 
-        builder.HasOne(stock => stock.Shelf)
+        builder.HasOne(stock => stock.Shelves)
             .WithMany(shelf => shelf.Stocks)
             .HasForeignKey(stock => stock.ShelfId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(stock => stock.Product)
+        builder.HasOne(stock => stock.Products)
             .WithMany(product => product.Stocks)
             .HasForeignKey(stock => stock.ProductId)
             .OnDelete(DeleteBehavior.Restrict);

@@ -24,9 +24,7 @@ builder.Services.AddScoped<PurchaseOrderService>();
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-});
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 

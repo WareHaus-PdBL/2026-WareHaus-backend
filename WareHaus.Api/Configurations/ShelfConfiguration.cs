@@ -4,9 +4,9 @@ using WareHaus.Api.Models;
 
 namespace WareHaus.Api.Configurations;
 
-public class ShelfConfiguration : IEntityTypeConfiguration<Shelf>
+public class ShelfConfiguration : IEntityTypeConfiguration<Shelves>
 {
-    public void Configure(EntityTypeBuilder<Shelf> builder)
+    public void Configure(EntityTypeBuilder<Shelves> builder)
     {
         builder.HasKey(shelf => shelf.Id);
 

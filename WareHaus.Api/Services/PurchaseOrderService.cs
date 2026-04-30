@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using WareHaus.API.Data;
+using WareHaus.Api.Data;
 using WareHaus.Api.Models;
 using WareHaus.Api.DTOs;
 
@@ -39,10 +39,10 @@ public class PurchaseOrderService
         await _context.SaveChangesAsync();
 
         return new PurchaseOrderResponseDto(
-            po.Id, 
-            po.PONumber, 
-            po.SupplierName, 
-            po.Status, 
+            po.Id,
+            po.PONumber,
+            po.SupplierName,
+            po.Status,
             po.POItems.Select(i => new POItemResponseDto(i.Id, i.ProductId, i.QtyExpected)).ToList()
         );
     }

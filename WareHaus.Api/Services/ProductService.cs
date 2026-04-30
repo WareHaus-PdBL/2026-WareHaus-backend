@@ -29,35 +29,40 @@ class ProductService : IProductService
     // Get Product Details by Id
     public async Task<GetProductDetailDto> GetProductDetailsAsync(int productId)
     {
-        var product = await _context.Products.Where(p => p.Id == productId)
-            .Select(p => new GetProductDetailDto(
-                p.Id,
-                p.SKU,
-                p.ProductName,
-                p.Barcode,
-                p.UnitOfMeasure,
-                p.Stocks.Select(s => new GetStockDto(
-                    s.Id,
-                    s.ShelfId,
-                    s.ProductId,
-                    s.Quantity,
-                    s.Shelves(sh => new GetShelfForZoneDto(
-                        sh.Id,
-                        sh.ShelfCode,
-                        sh.Aisle,
-                        sh.Capacity,
-                        sh.CurrentVolume,
-                        sh.QRCodePath ?? string.Empty)
-                    ))
-                )).ToList())
-            .FirstOrDefaultAsync();
+        // Load product with stocks and their shelves, then map to DTOs in memory
+        var productEntity = await _context.Products
+            .Include(p => p.Stocks)
+                .ThenInclude(s => s.Shelves)
+            .FirstOrDefaultAsync(p => p.Id == productId);
 
-        if (product == null)
+        if (productEntity == null)
         {
             throw new KeyNotFoundException("Product not found");
         }
 
-        return product;
+        var stocks = productEntity.Stocks.Select(s => new GetStockDto(
+            s.Id,
+            s.ShelfId,
+            s.ProductId,
+            s.Quantity,
+            s.Shelves != null
+                ? new GetShelfForZoneDto(
+                    s.Shelves.Id,
+                    s.Shelves.ShelfCode,
+                    s.Shelves.Aisle,
+                    s.Shelves.Capacity,
+                    s.Shelves.CurrentVolume,
+                    s.Shelves.QRCodePath ?? string.Empty)
+                : new GetShelfForZoneDto(0, string.Empty, 0, 0, 0, string.Empty)
+        )).ToList();
+
+        return new GetProductDetailDto(
+            productEntity.Id,
+            productEntity.SKU,
+            productEntity.ProductName,
+            productEntity.Barcode,
+            productEntity.UnitOfMeasure,
+            stocks);
     }
 
     // Create Product

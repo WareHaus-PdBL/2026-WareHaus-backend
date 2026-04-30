@@ -4,9 +4,9 @@ using WareHaus.Api.Models;
 
 namespace WareHaus.Api.Configurations;
 
-public class ProductConfiguration : IEntityTypeConfiguration<Product>
+public class ProductConfiguration : IEntityTypeConfiguration<Products>
 {
-    public void Configure(EntityTypeBuilder<Product> builder)
+    public void Configure(EntityTypeBuilder<Products> builder)
     {
         builder.HasKey(product => product.Id);
 

@@ -32,6 +32,10 @@ public class GlobalExceptionHandler : IExceptionHandler
                 statusCode = StatusCodes.Status400BadRequest;
                 title = "Invalid Request";
                 break;
+            case InvalidOperationException:
+                statusCode = StatusCodes.Status409Conflict;
+                title = "Conflict Detected";
+                break;
             case UnauthorizedAccessException:
                 statusCode = StatusCodes.Status401Unauthorized;
                 title = "Unauthorized Access";

@@ -4,9 +4,9 @@ using WareHaus.Api.Models;
 
 namespace WareHaus.Api.Configurations;
 
-public class ZoneConfiguration : IEntityTypeConfiguration<Zone>
+public class ZoneConfiguration : IEntityTypeConfiguration<Zones>
 {
-    public void Configure(EntityTypeBuilder<Zone> builder)
+    public void Configure(EntityTypeBuilder<Zones> builder)
     {
         builder.HasKey(zone => zone.Id);
 
@@ -26,7 +26,7 @@ public class ZoneConfiguration : IEntityTypeConfiguration<Zone>
             .IsRequired();
 
         builder.HasMany(zone => zone.Shelves)
-            .WithOne(shelf => shelf.Zone)
+            .WithOne(shelf => shelf.Zones)
             .HasForeignKey(shelf => shelf.ZoneId)
             .OnDelete(DeleteBehavior.Restrict);
     }
