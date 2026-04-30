@@ -41,15 +41,15 @@ class ProductService : IProductService
                     s.ShelfId,
                     s.ProductId,
                     s.Quantity,
-                    new GetShelfForZoneDto(
-                        s.Shelf.Id,
-                        s.Shelf.ShelfCode,
-                        s.Shelf.Aisle,
-                        s.Shelf.Capacity,
-                        s.Shelf.CurrentVolume,
-                        s.Shelf.QRCodePath
-                    )
-                )).ToList()))
+                    s.Shelves(sh => new GetShelfForZoneDto(
+                        sh.Id,
+                        sh.ShelfCode,
+                        sh.Aisle,
+                        sh.Capacity,
+                        sh.CurrentVolume,
+                        sh.QRCodePath ?? string.Empty)
+                    ))
+                )).ToList())
             .FirstOrDefaultAsync();
 
         if (product == null)
@@ -68,7 +68,7 @@ class ProductService : IProductService
             throw new InvalidOperationException("Produk dengan SKU " + createProductDto.SKU + " sudah ada");
         }
 
-        var product = new Models.Product
+        var product = new Models.Products
         {
             SKU = createProductDto.SKU,
             ProductName = createProductDto.ProductName,

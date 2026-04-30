@@ -1,11 +1,12 @@
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using WareHaus.Api.Data;
-using WareHaus.Api;
+using WareHaus.Api.Middleware;
 using WareHaus.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
+Env.Load("../.env");
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
 
 builder.Services.AddOpenApi();
@@ -46,5 +47,3 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
-=======
-}

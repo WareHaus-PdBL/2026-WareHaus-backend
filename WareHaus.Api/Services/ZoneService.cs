@@ -70,7 +70,7 @@ class ZoneService : IZoneService
             throw new InvalidOperationException("Zona " + createZoneDto.ZoneCode + " sudah ada");
         }
 
-        var zone = new Zone
+        var zone = new Zones
         {
             ZoneCode = createZoneDto.ZoneCode,
             ZoneName = createZoneDto.ZoneName,
@@ -84,7 +84,7 @@ class ZoneService : IZoneService
         {
             for (int shelfNum = 1; shelfNum <= zone.ShelfPerAisle; shelfNum++)
             {
-                var shelf = new Shelf
+                var shelf = new Shelves
                 {
                     ShelfCode = $"{zone.ZoneCode}-{aisle}-{shelfNum}",
                     Aisle = aisle,
