@@ -17,23 +17,55 @@ namespace WareHaus.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("WareHaus.Api.Models.Product", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.POItems", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("POId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("ProductsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("PurchaseOrdersId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("QtyExpected")
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Barcode")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductsId");
+
+                    b.HasIndex("PurchaseOrdersId");
+
+                    b.ToTable("POItems");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.Products", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -43,43 +75,106 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("SKU")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UnitOfMeasure")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Barcode")
-                        .IsUnique();
-
-                    b.HasIndex("SKU")
-                        .IsUnique();
-
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Shelf", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.PurchaseOrders", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PONumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SupplierName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PurchaseOrders");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.ReceivingLogs", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("POItemId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("POItemsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("QtyReceived")
                         .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<int>("Aisle")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("POItemsId");
+
+                    b.ToTable("ReceivingLogs");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.Shelves", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Aisle")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
@@ -93,39 +188,31 @@ namespace WareHaus.Api.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("QRCodePath")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
                     b.Property<string>("ShelfCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("ZoneId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ZoneId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("ZonesId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ShelfCode")
-                        .IsUnique();
-
-                    b.HasIndex("ZoneId");
+                    b.HasIndex("ZonesId");
 
                     b.ToTable("Shelves");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Stock", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.Stocks", b =>
                 {
-                    b.Property<int>("ShelfId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -133,34 +220,42 @@ namespace WareHaus.Api.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("ProductsId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<Guid>("ShelfId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("ShelvesId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.HasKey("ShelfId", "ProductId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductsId");
+
+                    b.HasIndex("ShelvesId");
 
                     b.ToTable("Stocks");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Zone", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.Zones", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -172,74 +267,95 @@ namespace WareHaus.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("LevelPerShelf")
+                        .HasColumnType("int");
+
                     b.Property<int>("ShelfPerAisle")
                         .HasColumnType("int");
 
                     b.Property<int>("TotalAisle")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ZoneCode")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ZoneName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ZoneCode")
-                        .IsUnique();
 
                     b.ToTable("Zones");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Shelf", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.POItems", b =>
                 {
-                    b.HasOne("WareHaus.Api.Models.Zone", "Zone")
+                    b.HasOne("WareHaus.Api.Models.Products", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductsId");
+
+                    b.HasOne("WareHaus.Api.Models.PurchaseOrders", "PurchaseOrders")
+                        .WithMany("POItems")
+                        .HasForeignKey("PurchaseOrdersId");
+
+                    b.Navigation("Products");
+
+                    b.Navigation("PurchaseOrders");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.ReceivingLogs", b =>
+                {
+                    b.HasOne("WareHaus.Api.Models.POItems", "POItems")
+                        .WithMany("ReceivingLogs")
+                        .HasForeignKey("POItemsId");
+
+                    b.Navigation("POItems");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.Shelves", b =>
+                {
+                    b.HasOne("WareHaus.Api.Models.Zones", "Zones")
                         .WithMany("Shelves")
-                        .HasForeignKey("ZoneId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ZonesId");
 
-                    b.Navigation("Zone");
+                    b.Navigation("Zones");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Stock", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.Stocks", b =>
                 {
-                    b.HasOne("WareHaus.Api.Models.Product", "Product")
+                    b.HasOne("WareHaus.Api.Models.Products", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductsId");
+
+                    b.HasOne("WareHaus.Api.Models.Shelves", "Shelves")
                         .WithMany("Stocks")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ShelvesId");
 
-                    b.HasOne("WareHaus.Api.Models.Shelf", "Shelf")
-                        .WithMany("Stocks")
-                        .HasForeignKey("ShelfId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("Products");
 
-                    b.Navigation("Product");
-
-                    b.Navigation("Shelf");
+                    b.Navigation("Shelves");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Product", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.POItems", b =>
+                {
+                    b.Navigation("ReceivingLogs");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.PurchaseOrders", b =>
+                {
+                    b.Navigation("POItems");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.Shelves", b =>
                 {
                     b.Navigation("Stocks");
                 });
 
-            modelBuilder.Entity("WareHaus.Api.Models.Shelf", b =>
-                {
-                    b.Navigation("Stocks");
-                });
-
-            modelBuilder.Entity("WareHaus.Api.Models.Zone", b =>
+            modelBuilder.Entity("WareHaus.Api.Models.Zones", b =>
                 {
                     b.Navigation("Shelves");
                 });

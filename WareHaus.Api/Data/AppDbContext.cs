@@ -10,10 +10,13 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Zone> Zones => Set<Zone>();
-    public DbSet<Shelf> Shelves => Set<Shelf>();
-    public DbSet<Product> Products => Set<Product>();
-    public DbSet<Stock> Stocks => Set<Stock>();
+    public DbSet<Products> Products { get; set; }
+    public DbSet<PurchaseOrders> PurchaseOrders { get; set; }
+    public DbSet<POItems> POItems { get; set; }
+    public DbSet<ReceivingLogs> ReceivingLogs { get; set; }
+    public DbSet<Zones> Zones { get; set; }
+    public DbSet<Shelves> Shelves { get; set; }
+    public DbSet<Stocks> Stocks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
