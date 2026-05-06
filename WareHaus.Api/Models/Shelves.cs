@@ -2,7 +2,9 @@ namespace WareHaus.Api.Models;
 
 public class Shelves : BaseEntities
 {
-    public Guid ZoneId { get; set; }
+    public int ZoneId { get; set; }
+
+    public string Aisle { get; set; } = string.Empty;
 
     public string ShelfCode { get; set; } = string.Empty;
 
@@ -12,7 +14,7 @@ public class Shelves : BaseEntities
 
     public string? QRCodePath { get; set; }
 
-    public Zones Zone { get; set; } = null!;
+    public Zones? Zones { get; set; }
 
     public ICollection<Stocks> Stocks { get; set; } = new List<Stocks>();
 }

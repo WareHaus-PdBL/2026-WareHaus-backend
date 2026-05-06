@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WareHaus.Api.Data;
@@ -11,9 +12,11 @@ using WareHaus.Api.Data;
 namespace WareHaus.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505141643_InitialPostgreSqlCreate")]
+    partial class InitialPostgreSqlCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,13 @@ namespace WareHaus.Api.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ProductsId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PurchaseOrdersId")
                         .HasColumnType("integer");
 
                     b.Property<int>("QtyExpected")
@@ -53,11 +62,11 @@ namespace WareHaus.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductsId");
 
-                    b.HasIndex("PurchaseOrderId");
+                    b.HasIndex("PurchaseOrdersId");
 
-                    b.ToTable("POItems", (string)null);
+                    b.ToTable("POItems");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.PackingItems", b =>
@@ -80,6 +89,9 @@ namespace WareHaus.Api.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ProductsId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("QtyVerified")
                         .HasColumnType("integer");
 
@@ -92,7 +104,9 @@ namespace WareHaus.Api.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("PackingItems", (string)null);
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("PackingItems");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.PackingTasks", b =>
@@ -133,7 +147,7 @@ namespace WareHaus.Api.Migrations
 
                     b.HasIndex("SOId");
 
-                    b.ToTable("PackingTasks", (string)null);
+                    b.ToTable("PackingTasks");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.Products", b =>
@@ -145,8 +159,7 @@ namespace WareHaus.Api.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Barcode")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -156,43 +169,22 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SKU")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("UnitOfMeasure")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Barcode")
-                        .IsUnique();
-
-                    b.HasIndex("SKU")
-                        .IsUnique();
-
-                    b.ToTable("Products", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Barcode = "899000000001",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ProductName = "Sample Product",
-                            SKU = "PRD-001",
-                            UnitOfMeasure = "pcs",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
-                        });
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.PurchaseOrders", b =>
@@ -214,28 +206,22 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("PONumber")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SupplierName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PONumber")
-                        .IsUnique();
-
-                    b.ToTable("PurchaseOrders", (string)null);
+                    b.ToTable("PurchaseOrders");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.ReceivingLogs", b =>
@@ -248,8 +234,7 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("Condition")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -263,6 +248,9 @@ namespace WareHaus.Api.Migrations
                     b.Property<int>("POItemId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("POItemsId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
@@ -270,6 +258,9 @@ namespace WareHaus.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PurchaseOrdersId")
                         .HasColumnType("integer");
 
                     b.Property<int>("QtyReceived")
@@ -283,13 +274,13 @@ namespace WareHaus.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("POItemId");
+                    b.HasIndex("POItemsId");
 
                     b.HasIndex("ProductsId");
 
-                    b.HasIndex("PurchaseOrderId");
+                    b.HasIndex("PurchaseOrdersId");
 
-                    b.ToTable("ReceivingLogs", (string)null);
+                    b.ToTable("ReceivingLogs");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.SOItems", b =>
@@ -309,6 +300,9 @@ namespace WareHaus.Api.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ProductsId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("QtyOrdered")
                         .HasColumnType("integer");
 
@@ -325,9 +319,11 @@ namespace WareHaus.Api.Migrations
 
                     b.HasIndex("ProductId");
 
+                    b.HasIndex("ProductsId");
+
                     b.HasIndex("SOId");
 
-                    b.ToTable("SOItems", (string)null);
+                    b.ToTable("SOItems");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.SalesOrders", b =>
@@ -370,7 +366,7 @@ namespace WareHaus.Api.Migrations
                     b.HasIndex("SONumber")
                         .IsUnique();
 
-                    b.ToTable("SalesOrders", (string)null);
+                    b.ToTable("SalesOrders");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.Shelves", b =>
@@ -383,8 +379,7 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("Aisle")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Capacity")
                         .HasColumnType("integer");
@@ -399,13 +394,11 @@ namespace WareHaus.Api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("QRCodePath")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ShelfCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -413,27 +406,14 @@ namespace WareHaus.Api.Migrations
                     b.Property<int>("ZoneId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ZonesId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ShelfCode")
-                        .IsUnique();
+                    b.HasIndex("ZonesId");
 
-                    b.HasIndex("ZoneId");
-
-                    b.ToTable("Shelves", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Aisle = "A1",
-                            Capacity = 100,
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CurrentVolume = 0,
-                            ShelfCode = "SH-A1-001",
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ZoneId = 1
-                        });
+                    b.ToTable("Shelves");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.Shipments", b =>
@@ -483,7 +463,7 @@ namespace WareHaus.Api.Migrations
 
                     b.HasIndex("PackingTaskId");
 
-                    b.ToTable("Shipments", (string)null);
+                    b.ToTable("Shipments");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.Stocks", b =>
@@ -503,10 +483,16 @@ namespace WareHaus.Api.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ProductsId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
                     b.Property<int>("ShelfId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ShelvesId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -514,12 +500,11 @@ namespace WareHaus.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ShelfId");
+                    b.HasIndex("ProductsId");
 
-                    b.HasIndex("ProductId", "ShelfId")
-                        .IsUnique();
+                    b.HasIndex("ShelvesId");
 
-                    b.ToTable("Stocks", (string)null);
+                    b.ToTable("Stocks");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.Zones", b =>
@@ -532,8 +517,7 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -542,8 +526,7 @@ namespace WareHaus.Api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("LevelPerShelf")
                         .HasColumnType("integer");
@@ -559,50 +542,26 @@ namespace WareHaus.Api.Migrations
 
                     b.Property<string>("ZoneCode")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ZoneName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ZoneCode")
-                        .IsUnique();
-
-                    b.ToTable("Zones", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Category = "General",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Sample zone untuk testing",
-                            LevelPerShelf = 1,
-                            ShelfPerAisle = 1,
-                            TotalAisle = 1,
-                            UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ZoneCode = "ZONE-A",
-                            ZoneName = "Zone A"
-                        });
+                    b.ToTable("Zones");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.POItems", b =>
                 {
                     b.HasOne("WareHaus.Api.Models.Products", "Products")
                         .WithMany("POItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ProductsId");
 
                     b.HasOne("WareHaus.Api.Models.PurchaseOrders", "PurchaseOrders")
                         .WithMany("POItems")
-                        .HasForeignKey("PurchaseOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("PurchaseOrdersId");
 
                     b.Navigation("Products");
 
@@ -618,10 +577,14 @@ namespace WareHaus.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("WareHaus.Api.Models.Products", "Products")
-                        .WithMany("PackingItems")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("WareHaus.Api.Models.Products", null)
+                        .WithMany("PackingItems")
+                        .HasForeignKey("ProductsId");
 
                     b.Navigation("PackingTasks");
 
@@ -643,9 +606,7 @@ namespace WareHaus.Api.Migrations
                 {
                     b.HasOne("WareHaus.Api.Models.POItems", "POItems")
                         .WithMany("ReceivingLogs")
-                        .HasForeignKey("POItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("POItemsId");
 
                     b.HasOne("WareHaus.Api.Models.Products", "Products")
                         .WithMany()
@@ -653,9 +614,7 @@ namespace WareHaus.Api.Migrations
 
                     b.HasOne("WareHaus.Api.Models.PurchaseOrders", "PurchaseOrders")
                         .WithMany("ReceivingLogs")
-                        .HasForeignKey("PurchaseOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("PurchaseOrdersId");
 
                     b.Navigation("POItems");
 
@@ -667,10 +626,14 @@ namespace WareHaus.Api.Migrations
             modelBuilder.Entity("WareHaus.Api.Models.SOItems", b =>
                 {
                     b.HasOne("WareHaus.Api.Models.Products", "Products")
-                        .WithMany("SOItems")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("WareHaus.Api.Models.Products", null)
+                        .WithMany("SOItems")
+                        .HasForeignKey("ProductsId");
 
                     b.HasOne("WareHaus.Api.Models.SalesOrders", "SalesOrders")
                         .WithMany("SOItems")
@@ -687,9 +650,7 @@ namespace WareHaus.Api.Migrations
                 {
                     b.HasOne("WareHaus.Api.Models.Zones", "Zones")
                         .WithMany("Shelves")
-                        .HasForeignKey("ZoneId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ZonesId");
 
                     b.Navigation("Zones");
                 });
@@ -709,15 +670,11 @@ namespace WareHaus.Api.Migrations
                 {
                     b.HasOne("WareHaus.Api.Models.Products", "Products")
                         .WithMany("Stocks")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ProductsId");
 
                     b.HasOne("WareHaus.Api.Models.Shelves", "Shelves")
                         .WithMany("Stocks")
-                        .HasForeignKey("ShelfId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ShelvesId");
 
                     b.Navigation("Products");
 

@@ -1,10 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using WareHaus.API.Data;
-using WareHaus.Api.Models;
+using WareHaus.Api.Data;
 using WareHaus.Api.DTOs;
-using System.Collections.Generic;
+using WareHaus.Api.Models;
 
 namespace WareHaus.Api.Services;
 
@@ -19,82 +16,95 @@ public class InboundServices
 
     public async Task<PurchaseOrders> CreatePOAsync(CreatePurchaseOrderDto dto)
     {
-        var po = new PurchaseOrders
+        var purchaseOrder = new PurchaseOrders
         {
-            Id = Guid.NewGuid(),
             PONumber = dto.PONumber,
             SupplierName = dto.SupplierName,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            Status = "Pending",
+            OrderDate = DateTime.UtcNow
         };
 
         foreach (var item in dto.Items)
         {
-            po.POItems.Add(new POItems
+            purchaseOrder.POItems.Add(new POItems
             {
-                Id = Guid.NewGuid(),
                 ProductId = item.ProductId,
                 QtyExpected = item.QtyExpected,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                QtyReceived = 0
             });
         }
 
-        _context.PurchaseOrders.Add(po);
+        _context.PurchaseOrders.Add(purchaseOrder);
         await _context.SaveChangesAsync();
-        return po;
+
+        return purchaseOrder;
     }
 
     public async Task<ReceivingLogs> ReceiveItemAsync(ReceiveItemDto dto)
     {
-        var log = new ReceivingLogs
+        var poItem = await _context.POItems
+            .FirstOrDefaultAsync(item => item.Id == dto.POItemId && item.DeletedAt == null);
+
+        if (poItem == null)
         {
-            Id = Guid.NewGuid(),
-            POItemId = dto.POItemId,
+            throw new KeyNotFoundException("PO Item tidak ditemukan");
+        }
+
+        var receivingLog = new ReceivingLogs
+        {
+            PurchaseOrderId = poItem.PurchaseOrderId,
+            POItemId = poItem.Id,
+            ProductId = poItem.ProductId,
             QtyReceived = dto.QtyReceived,
             Condition = dto.Condition,
             ExpiryDate = dto.ExpiryDate,
-            ReceivedAt = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            ReceivedAt = DateTime.UtcNow
         };
 
-        _context.ReceivingLogs.Add(log);
+        poItem.QtyReceived += dto.QtyReceived;
+
+        _context.ReceivingLogs.Add(receivingLog);
         await _context.SaveChangesAsync();
-        return log;
+
+        return receivingLog;
     }
 
     public async Task<Stocks> PutawayAsync(PutawayDto dto)
     {
-        var shelf = await _context.Shelves.FirstOrDefaultAsync(s => s.ShelfCode == dto.ShelfCode);
-        if (shelf == null) throw new KeyNotFoundException("Rak tidak ditemukan");
+        var shelf = await _context.Shelves
+            .FirstOrDefaultAsync(shelf => shelf.ShelfCode == dto.ShelfCode && shelf.DeletedAt == null);
 
-        var stock = await _context.Stocks.FirstOrDefaultAsync(s => s.ShelfId == shelf.Id && s.ProductId == dto.ProductId);
+        if (shelf == null)
+        {
+            throw new KeyNotFoundException("Rak tidak ditemukan");
+        }
+
+        var stock = await _context.Stocks
+            .FirstOrDefaultAsync(stock =>
+                stock.ShelfId == shelf.Id &&
+                stock.ProductId == dto.ProductId &&
+                stock.DeletedAt == null);
 
         if (stock == null)
         {
             stock = new Stocks
             {
-                Id = Guid.NewGuid(),
                 ShelfId = shelf.Id,
                 ProductId = dto.ProductId,
-                Quantity = dto.Quantity,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                Quantity = dto.Quantity
             };
+
             _context.Stocks.Add(stock);
         }
         else
         {
             stock.Quantity += dto.Quantity;
-            stock.UpdatedAt = DateTime.UtcNow;
-            _context.Stocks.Update(stock);
         }
 
         shelf.CurrentVolume += dto.Quantity;
-        _context.Shelves.Update(shelf);
 
         await _context.SaveChangesAsync();
+
         return stock;
     }
 }

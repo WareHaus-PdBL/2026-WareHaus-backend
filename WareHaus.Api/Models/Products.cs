@@ -12,5 +12,9 @@ public class Products : BaseEntities
 
     public ICollection<POItems> POItems { get; set; } = new List<POItems>();
 
+    public ICollection<SOItems> SOItems { get; set; } = new List<SOItems>();
+
     public ICollection<Stocks> Stocks { get; set; } = new List<Stocks>();
+
+    public ICollection<PackingItems> PackingItems { get; set; } = new List<PackingItems>();
 }
