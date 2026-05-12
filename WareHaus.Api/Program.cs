@@ -21,6 +21,7 @@ builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<PurchaseOrderService>();
 builder.Services.AddScoped<ReceivingService>();
+builder.Services.AddScoped<SmartLogisticsService>();
 
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()));
 
