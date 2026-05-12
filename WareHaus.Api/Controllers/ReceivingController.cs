@@ -17,7 +17,7 @@ public class ReceivingController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> ReceiveItem([FromBody] CreateReceivingDto dto)
+    public async Task<IActionResult> ReceiveItem([FromForm] CreateReceivingDto dto)
     {
         var result = await _receivingService.ReceiveItemAsync(dto);
         return Ok(result);

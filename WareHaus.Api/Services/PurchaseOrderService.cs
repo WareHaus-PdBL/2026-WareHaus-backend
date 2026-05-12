@@ -47,12 +47,16 @@ public class PurchaseOrderService
         _context.PurchaseOrders.Add(po);
         await _context.SaveChangesAsync();
 
+        int totalExpected = po.POItems.Sum(i => i.QtyExpected);
+
         return new PurchaseOrderResponseDto(
             po.Id,
             po.PONumber,
             po.SupplierName,
             po.Status,
-            po.POItems.Select(i => new POItemResponseDto(i.Id, i.ProductId, i.QtyExpected)).ToList()
+            totalExpected,
+            0,
+            po.POItems.Select(i => new POItemResponseDto(i.Id, i.ProductId, i.QtyExpected, 0)).ToList()
         );
     }
 
@@ -61,12 +65,20 @@ public class PurchaseOrderService
         return await _context.PurchaseOrders
             .Where(po => po.DeletedAt == null)
             .Include(po => po.POItems.Where(i => i.DeletedAt == null))
+                .ThenInclude(i => i.ReceivingLogs.Where(r => r.DeletedAt == null))
             .Select(po => new PurchaseOrderResponseDto(
                 po.Id,
                 po.PONumber,
                 po.SupplierName,
                 po.Status,
-                po.POItems.Select(i => new POItemResponseDto(i.Id, i.ProductId, i.QtyExpected)).ToList()
+                po.POItems.Sum(i => i.QtyExpected),
+                po.POItems.Sum(i => i.ReceivingLogs.Sum(r => r.QtyReceived)),
+                po.POItems.Select(i => new POItemResponseDto(
+                    i.Id, 
+                    i.ProductId, 
+                    i.QtyExpected, 
+                    i.ReceivingLogs.Sum(r => r.QtyReceived)
+                )).ToList()
             ))
             .ToListAsync();
     }
@@ -74,9 +86,10 @@ public class PurchaseOrderService
     public async Task<PurchaseOrderResponseDto?> GetPODetailsAsync(int poId)
     {
         var po = await _context.PurchaseOrders
-            .Where(p => p.DeletedAt == null)
-            .Include(po => po.POItems.Where(i => i.DeletedAt == null))
-            .FirstOrDefaultAsync(p => p.Id == poId);
+            .Where(p => p.DeletedAt == null && p.Id == poId)
+            .Include(p => p.POItems.Where(i => i.DeletedAt == null))
+                .ThenInclude(i => i.ReceivingLogs.Where(r => r.DeletedAt == null))
+            .FirstOrDefaultAsync();
 
         if (po == null) return null;
 
@@ -85,16 +98,24 @@ public class PurchaseOrderService
             po.PONumber,
             po.SupplierName,
             po.Status,
-            po.POItems.Select(i => new POItemResponseDto(i.Id, i.ProductId, i.QtyExpected)).ToList()
+            po.POItems.Sum(i => i.QtyExpected),
+            po.POItems.Sum(i => i.ReceivingLogs.Sum(r => r.QtyReceived)),
+            po.POItems.Select(i => new POItemResponseDto(
+                i.Id, 
+                i.ProductId, 
+                i.QtyExpected, 
+                i.ReceivingLogs.Sum(r => r.QtyReceived)
+            )).ToList()
         );
     }
 
     public async Task<PurchaseOrderResponseDto?> UpdatePOStatusAsync(int poId, string newStatus)
     {
         var po = await _context.PurchaseOrders
-            .Where(p => p.DeletedAt == null)
-            .Include(po => po.POItems.Where(i => i.DeletedAt == null))
-            .FirstOrDefaultAsync(p => p.Id == poId);
+            .Where(p => p.DeletedAt == null && p.Id == poId)
+            .Include(p => p.POItems.Where(i => i.DeletedAt == null))
+                .ThenInclude(i => i.ReceivingLogs.Where(r => r.DeletedAt == null))
+            .FirstOrDefaultAsync();
 
         if (po == null) return null;
 
@@ -108,7 +129,14 @@ public class PurchaseOrderService
             po.PONumber,
             po.SupplierName,
             po.Status,
-            po.POItems.Select(i => new POItemResponseDto(i.Id, i.ProductId, i.QtyExpected)).ToList()
+            po.POItems.Sum(i => i.QtyExpected),
+            po.POItems.Sum(i => i.ReceivingLogs.Sum(r => r.QtyReceived)),
+            po.POItems.Select(i => new POItemResponseDto(
+                i.Id, 
+                i.ProductId, 
+                i.QtyExpected, 
+                i.ReceivingLogs.Sum(r => r.QtyReceived)
+            )).ToList()
         );
     }
 

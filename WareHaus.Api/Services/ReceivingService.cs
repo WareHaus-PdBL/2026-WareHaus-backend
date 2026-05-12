@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using WareHaus.Api.Data;
 using WareHaus.Api.Models;
@@ -12,10 +14,12 @@ namespace WareHaus.Api.Services;
 public class ReceivingService
 {
     private readonly AppDbContext _context;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public ReceivingService(AppDbContext context)
+    public ReceivingService(AppDbContext context, IWebHostEnvironment webHostEnvironment)
     {
         _context = context;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     public async Task<ReceivingResponseDto> ReceiveItemAsync(CreateReceivingDto dto)
@@ -29,6 +33,27 @@ public class ReceivingService
             throw new KeyNotFoundException("PO Item not found");
         }
 
+        string photoUrlPath = string.Empty;
+        if (dto.Photo != null && dto.Photo.Length > 0)
+        {
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads", "receiving");
+            
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.Photo.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await dto.Photo.CopyToAsync(fileStream);
+            }
+
+            photoUrlPath = $"/uploads/receiving/{uniqueFileName}";
+        }
+
         var log = new ReceivingLogs
         {
             POItemId = dto.POItemId,
@@ -36,7 +61,7 @@ public class ReceivingService
             Condition = dto.Condition,
             ReceivedAt = DateTime.UtcNow,
             ExpiryDate = dto.ExpiryDate.ToUniversalTime(),
-            PhotoUrl = dto.PhotoUrl ?? string.Empty,
+            PhotoUrl = photoUrlPath,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };

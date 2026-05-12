@@ -23,7 +23,7 @@ RUN dotnet publish "WareHaus.Api.csproj" -c Release -o /app/publish /p:UseAppHos
 
 # STAGE 3: Runtime .NET 10 (Chiseled/Distroless untuk keamanan ekstra)
 # .NET 10 sangat menyarankan image 'chiseled' untuk produksi yang lebih aman dan kecil
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-jammy-chiseled AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
