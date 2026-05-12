@@ -29,7 +29,9 @@ public class OutboundService
     {
         var salesOrder = await _context.SalesOrders
             .Include(order => order.SOItems)
-            .FirstOrDefaultAsync(order => order.Id == id && order.DeletedAt == null);
+            .FirstOrDefaultAsync(order =>
+                order.Id == id &&
+                order.DeletedAt == null);
 
         if (salesOrder == null)
         {
@@ -49,7 +51,9 @@ public class OutboundService
         var salesOrder = new SalesOrders
         {
             SONumber = GenerateSONumber(),
-            CustomerName = string.IsNullOrWhiteSpace(dto.CustomerName) ? "Someone" : dto.CustomerName,
+            CustomerName = string.IsNullOrWhiteSpace(dto.CustomerName)
+                ? "Someone"
+                : dto.CustomerName,
             Status = "Pending",
             OrderDate = DateTime.UtcNow
         };
@@ -62,11 +66,14 @@ public class OutboundService
             }
 
             var productExists = await _context.Products
-                .AnyAsync(product => product.Id == item.ProductId && product.DeletedAt == null);
+                .AnyAsync(product =>
+                    product.Id == item.ProductId &&
+                    product.DeletedAt == null);
 
             if (!productExists)
             {
-                throw new KeyNotFoundException($"Product dengan ID {item.ProductId} tidak ditemukan");
+                throw new KeyNotFoundException(
+                    $"Product dengan ID {item.ProductId} tidak ditemukan");
             }
 
             salesOrder.SOItems.Add(new SOItems
@@ -83,11 +90,15 @@ public class OutboundService
         return MapSalesOrderResponse(salesOrder);
     }
 
-    public async Task<SalesOrderResponseDto> UpdateSalesOrderAsync(int id, UpdateSalesOrderDto dto)
+    public async Task<SalesOrderResponseDto> UpdateSalesOrderAsync(
+        int id,
+        UpdateSalesOrderDto dto)
     {
         var salesOrder = await _context.SalesOrders
             .Include(order => order.SOItems)
-            .FirstOrDefaultAsync(order => order.Id == id && order.DeletedAt == null);
+            .FirstOrDefaultAsync(order =>
+                order.Id == id &&
+                order.DeletedAt == null);
 
         if (salesOrder == null)
         {
@@ -112,18 +123,22 @@ public class OutboundService
     public async Task DeleteSalesOrderAsync(int id)
     {
         var salesOrder = await _context.SalesOrders
-            .FirstOrDefaultAsync(order => order.Id == id && order.DeletedAt == null);
+            .FirstOrDefaultAsync(order =>
+                order.Id == id &&
+                order.DeletedAt == null);
 
         if (salesOrder == null)
         {
             throw new KeyNotFoundException("Sales Order tidak ditemukan");
         }
 
-        _context.SalesOrders.Remove(salesOrder);
+        salesOrder.DeletedAt = DateTime.UtcNow;
+
         await _context.SaveChangesAsync();
     }
 
-    public async Task<PackingTaskResponseDto> CreatePackingTaskAsync(CreatePackingTaskDto dto)
+    public async Task<PackingTaskResponseDto> CreatePackingTaskAsync(
+        CreatePackingTaskDto dto)
     {
         var salesOrder = await _context.SalesOrders
             .Include(order => order.SOItems)
@@ -138,7 +153,8 @@ public class OutboundService
 
         if (!salesOrder.SOItems.Any())
         {
-            throw new InvalidOperationException("Sales Order belum memiliki item");
+            throw new InvalidOperationException(
+                "Sales Order belum memiliki item");
         }
 
         var existingPackingTask = await _context.PackingTasks
@@ -149,7 +165,8 @@ public class OutboundService
 
         if (existingPackingTask != null)
         {
-            throw new InvalidOperationException("Sales Order ini sudah memiliki Packing Task");
+            throw new InvalidOperationException(
+                "Sales Order ini sudah memiliki Packing Task");
         }
 
         var packingTask = new PackingTasks
@@ -164,12 +181,11 @@ public class OutboundService
         salesOrder.Status = "Packing";
 
         _context.PackingTasks.Add(packingTask);
+
         await _context.SaveChangesAsync();
 
-        return MapPackingTaskResponse(packingTask);
-
+        return await MapPackingTaskResponseAsync(packingTask);
     }
-
 
     public async Task VerifyPackingItemAsync(VerifyPackingItemDto dto)
     {
@@ -185,7 +201,8 @@ public class OutboundService
 
         if (packingTask.PackingStatus == "Completed")
         {
-            throw new InvalidOperationException("Packing Task sudah selesai");
+            throw new InvalidOperationException(
+                "Packing Task sudah selesai");
         }
 
         var salesOrderItem = await _context.SOItems
@@ -196,19 +213,23 @@ public class OutboundService
 
         if (salesOrderItem == null)
         {
-            throw new KeyNotFoundException("Item Sales Order tidak ditemukan");
+            throw new KeyNotFoundException(
+                "Item Sales Order tidak ditemukan");
         }
 
         if (dto.QtyVerified <= 0)
         {
-            throw new InvalidOperationException("Qty verified harus lebih dari 0");
+            throw new InvalidOperationException(
+                "Qty verified harus lebih dari 0");
         }
 
-        var remainingQty = salesOrderItem.QtyOrdered - salesOrderItem.QtyPicked;
+        var remainingQty =
+            salesOrderItem.QtyOrdered - salesOrderItem.QtyPicked;
 
         if (dto.QtyVerified > remainingQty)
         {
-            throw new InvalidOperationException("Qty verified melebihi qty yang belum dipicking");
+            throw new InvalidOperationException(
+                "Qty verified melebihi qty yang belum dipicking");
         }
 
         salesOrderItem.QtyPicked += dto.QtyVerified;
@@ -221,10 +242,12 @@ public class OutboundService
         };
 
         _context.PackingItems.Add(packingItem);
+
         await _context.SaveChangesAsync();
     }
 
-    public async Task<PackingTaskResponseDto> CompletePackingTaskAsync(CompletePackingTaskDto dto)
+    public async Task<PackingTaskResponseDto> CompletePackingTaskAsync(
+        CompletePackingTaskDto dto)
     {
         var packingTask = await _context.PackingTasks
             .Include(task => task.SalesOrders)
@@ -243,11 +266,13 @@ public class OutboundService
                 item.DeletedAt == null)
             .ToListAsync();
 
-        var isAllPicked = salesOrderItems.All(item => item.QtyPicked >= item.QtyOrdered);
+        var isAllPicked = salesOrderItems
+            .All(item => item.QtyPicked >= item.QtyOrdered);
 
         if (!isAllPicked)
         {
-            throw new InvalidOperationException("Masih ada item yang belum selesai dipicking");
+            throw new InvalidOperationException(
+                "Masih ada item yang belum selesai dipicking");
         }
 
         packingTask.EndTime = DateTime.UtcNow;
@@ -255,15 +280,16 @@ public class OutboundService
 
         if (packingTask.SalesOrders != null)
         {
-            packingTask.SalesOrders.Status = "Packing";
+            packingTask.SalesOrders.Status = "Ready To Ship";
         }
 
         await _context.SaveChangesAsync();
 
-        return MapPackingTaskResponse(packingTask);
+        return await MapPackingTaskResponseAsync(packingTask);
     }
 
-    public async Task<ShipmentResponseDto> CreateShipmentAsync(CreateShipmentDto dto)
+    public async Task<ShipmentResponseDto> CreateShipmentAsync(
+        CreateShipmentDto dto)
     {
         var packingTask = await _context.PackingTasks
             .Include(task => task.SalesOrders)
@@ -273,22 +299,26 @@ public class OutboundService
 
         if (packingTask == null)
         {
-            throw new KeyNotFoundException("Packing Task tidak ditemukan");
+            throw new KeyNotFoundException(
+                "Packing Task tidak ditemukan");
         }
 
         if (packingTask.PackingStatus != "Completed")
         {
-            throw new InvalidOperationException("Packing Task belum completed");
+            throw new InvalidOperationException(
+                "Packing Task belum completed");
         }
 
         var shipment = new Shipments
         {
             PackingTaskId = packingTask.Id,
-            CourierName = string.IsNullOrWhiteSpace(dto.CourierName) ? "NONE" : dto.CourierName,
+            CourierName = string.IsNullOrWhiteSpace(dto.CourierName)
+                ? "NONE"
+                : dto.CourierName,
             TrackingNumber = dto.TrackingNumber,
             ShippingLabelUrl = dto.ShippingLabelUrl,
             ManifestDate = DateTime.UtcNow,
-            Status = "Ready"
+            Status = "Shipped"
         };
 
         if (packingTask.SalesOrders != null)
@@ -297,6 +327,7 @@ public class OutboundService
         }
 
         _context.Shipments.Add(shipment);
+
         await _context.SaveChangesAsync();
 
         return new ShipmentResponseDto(
@@ -315,14 +346,33 @@ public class OutboundService
         return $"SO-{DateTime.UtcNow:yyyyMMddHHmmss}";
     }
 
-    private static SalesOrderResponseDto MapSalesOrderResponse(SalesOrders salesOrder)
+    private static SalesOrderResponseDto MapSalesOrderResponse(
+        SalesOrders salesOrder)
     {
+        var totalItems = salesOrder.SOItems.Sum(item => item.QtyOrdered);
+
+        var totalPickedItems = salesOrder.SOItems
+            .Sum(item => item.QtyPicked);
+
+        var progressPercentage = totalItems == 0
+            ? 0
+            : Math.Round(
+                (double)totalPickedItems / totalItems * 100,
+                2);
+
+        var isCompleted = totalItems > 0 &&
+                          totalPickedItems >= totalItems;
+
         return new SalesOrderResponseDto(
             salesOrder.Id,
             salesOrder.SONumber,
             salesOrder.CustomerName,
             salesOrder.Status,
             salesOrder.OrderDate,
+            totalItems,
+            totalPickedItems,
+            progressPercentage,
+            isCompleted,
             salesOrder.SOItems
                 .Select(item => new SOItemResponseDto(
                     item.Id,
@@ -333,15 +383,34 @@ public class OutboundService
         );
     }
 
-    private static PackingTaskResponseDto MapPackingTaskResponse(PackingTasks packingTask)
+    private async Task<PackingTaskResponseDto> MapPackingTaskResponseAsync(
+        PackingTasks packingTask)
     {
+        var verifiedItems = await _context.PackingItems
+            .Where(item =>
+                item.PackingTaskId == packingTask.Id &&
+                item.DeletedAt == null)
+            .SumAsync(item => item.QtyVerified);
+
+        var progressPercentage = packingTask.TotalPackage == 0
+            ? 0
+            : Math.Round(
+                (double)verifiedItems / packingTask.TotalPackage * 100,
+                2);
+
+        var isCompleted =
+            verifiedItems >= packingTask.TotalPackage;
+
         return new PackingTaskResponseDto(
             packingTask.Id,
             packingTask.SOId,
             packingTask.StartTime,
             packingTask.EndTime,
             packingTask.TotalPackage,
-            packingTask.PackingStatus
+            verifiedItems,
+            progressPercentage,
+            packingTask.PackingStatus,
+            isCompleted
         );
     }
 }

@@ -21,6 +21,10 @@ public record SalesOrderResponseDto(
     string CustomerName,
     string Status,
     DateTime OrderDate,
+    int TotalItems,
+    int TotalPickedItems,
+    double ProgressPercentage,
+    bool IsCompleted,
     List<SOItemResponseDto> Items
 );
 
@@ -51,7 +55,10 @@ public record PackingTaskResponseDto(
     DateTime? StartTime,
     DateTime? EndTime,
     int TotalPackage,
-    string PackingStatus
+    int VerifiedItems,
+    double ProgressPercentage,
+    string PackingStatus,
+    bool IsCompleted
 );
 
 public record CreateShipmentDto(
