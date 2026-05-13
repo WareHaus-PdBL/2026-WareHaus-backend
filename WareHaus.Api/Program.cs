@@ -20,6 +20,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddScoped<IZoneService, ZoneService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<PurchaseOrderService>();
+builder.Services.AddScoped<ReceivingService>();
+builder.Services.AddScoped<SmartLogisticsService>();
 
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()));
 
@@ -27,6 +29,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.UseStaticFiles();
 app.UseCors("AllowAll");

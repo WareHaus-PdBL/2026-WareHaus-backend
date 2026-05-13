@@ -22,4 +22,44 @@ public class PurchaseOrdersController : ControllerBase
         var result = await _poService.CreatePOAsync(dto);
         return Ok(result);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllPOs()
+    {
+        var result = await _poService.GetAllPOsAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetPODetails(int id)
+    {
+        var result = await _poService.GetPODetailsAsync(id);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return Ok(result);
+    }
+
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdatePOStatus(int id, [FromBody] string status)
+    {
+        var result = await _poService.UpdatePOStatusAsync(id, status);
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePO(int id)
+    {
+        var success = await _poService.DeletePOAsync(id);
+        if (!success)
+        {
+            return NotFound();
+        }
+        return NoContent();
+    }
 }
