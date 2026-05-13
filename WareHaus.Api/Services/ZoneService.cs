@@ -33,25 +33,11 @@ class ZoneService : IZoneService
             .ToListAsync();
     }
 
-    // Get Zone Details by Aisle
+    // Get Zone Details
     public async Task<GetDetailsZoneDto> GetDetailsZoneAsync(int zoneId, int? aisle)
     {
         var zone = await _context.Zones.Where(z => z.Id == zoneId)
-            .Select(z => new GetDetailsZoneDto(
-                z.Id,
-                z.ZoneCode,
-                z.ZoneName,
-                z.Category,
-                z.Description,
-                z.TotalAisle,
-                z.ShelfPerAisle,
-                z.Shelves.Where(s => s.Aisle == aisle).Select(s => new GetShelfForZoneDto(
-                    s.Id,
-                    s.ShelfCode,
-                    s.Aisle,
-                    s.Capacity,
-                    s.CurrentVolume,
-                    s.QRCodePath ?? string.Empty)).ToList()))
+            .Include(z => z.Shelves)
             .FirstOrDefaultAsync();
 
         if (zone == null)
@@ -59,7 +45,54 @@ class ZoneService : IZoneService
             throw new KeyNotFoundException("Zone not found");
         }
 
-        return zone;
+        var emptyShelves = zone.Shelves.Where(s => s.CurrentVolume == 0).Count();
+
+        if (aisle.HasValue)
+        {
+            var shelves = zone.Shelves
+                .Where(s => s.Aisle == aisle.Value)
+                .Select(s => new GetShelfForZoneDto(
+                    s.Id,
+                    s.ShelfCode,
+                    s.Aisle,
+                    s.Capacity,
+                    s.CurrentVolume,
+                    s.QRCodePath ?? string.Empty))
+                .ToList();
+
+            return new GetDetailsZoneDto(
+                zone.Id,
+                zone.ZoneCode,
+                zone.ZoneName,
+                zone.Category,
+                zone.Description,
+                zone.TotalAisle,
+                zone.ShelfPerAisle,
+                emptyShelves,
+                null,
+                shelves);
+        }
+
+        var aisles = Enumerable.Range(1, zone.TotalAisle)
+            .Select(i => new GetAisleDto(
+                i,
+                !zone.Shelves.Any(s => s.Aisle == i && s.CurrentVolume > 0),
+                zone.Shelves.Count(s => s.Aisle == i),
+                zone.Shelves.Where(s => s.Aisle == i).Sum(s => s.Capacity),
+                zone.Shelves.Where(s => s.Aisle == i).Sum(s => s.CurrentVolume)))
+            .ToList();
+
+        return new GetDetailsZoneDto(
+            zone.Id,
+            zone.ZoneCode,
+            zone.ZoneName,
+            zone.Category,
+            zone.Description,
+            zone.TotalAisle,
+            zone.ShelfPerAisle,
+            emptyShelves,
+            aisles,
+            null);
     }
 
     // Create Zone

@@ -28,6 +28,6 @@ public class ZoneConfiguration : IEntityTypeConfiguration<Zones>
         builder.HasMany(zone => zone.Shelves)
             .WithOne(shelf => shelf.Zones)
             .HasForeignKey(shelf => shelf.ZoneId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

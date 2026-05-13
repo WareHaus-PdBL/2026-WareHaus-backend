@@ -20,7 +20,9 @@ public record GetDetailsZoneDto(
     string Description,
     int TotalAisle,
     int ShelfPerAisle,
-    List<GetShelfForZoneDto> Shelves
+    int EmptyShelves,
+    List<GetAisleDto>? Aisle,
+    List<GetShelfForZoneDto>? Shelves
 );
 
 public record CreateZoneDto(
