@@ -8,8 +8,9 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
-    }
 
+    }
+    
     public DbSet<Products> Products { get; set; }
     public DbSet<PurchaseOrders> PurchaseOrders { get; set; }
     public DbSet<POItems> POItems { get; set; }
@@ -17,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<Zones> Zones { get; set; }
     public DbSet<Shelves> Shelves { get; set; }
     public DbSet<Stocks> Stocks { get; set; }
+    public DbSet<StockLogs> StockLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -45,7 +45,7 @@ class ZoneService : IZoneService
                 z.Description,
                 z.TotalAisle,
                 z.ShelfPerAisle,
-                z.Shelves.Where(s => s.Aisle == aisle).Select(s => new GetShelfForZoneDto(
+                z.Shelves.Where(s => aisle == null || s.Aisle == aisle).Select(s => new GetShelfForZoneDto(  
                     s.Id,
                     s.ShelfCode,
                     s.Aisle,
@@ -90,6 +90,10 @@ class ZoneService : IZoneService
                     Aisle = aisle,
                     Capacity = createZoneDto.CapacityPerShelf,
                     CurrentVolume = 0,
+                    MaxCapacity = createZoneDto.CapacityPerShelf,
+                    CurrentCapacity = 0,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                     QRCodePath = await GenerateQRCodeAsync($"{zone.ZoneCode}-{aisle}-{shelfNum}", zone.ZoneCode)
                 };
                 zone.Shelves.Add(shelf);
