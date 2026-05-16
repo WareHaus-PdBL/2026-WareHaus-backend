@@ -12,8 +12,8 @@ using WareHaus.Api.Data;
 namespace WareHaus.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260512033011_ConfigureCascadeDeleteZoneToShelves")]
-    partial class ConfigureCascadeDeleteZoneToShelves
+    [Migration("20260516050036_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -175,6 +175,10 @@ namespace WareHaus.Api.Migrations
                     b.Property<int?>("POItemsId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PhotoUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("QtyReceived")
                         .HasColumnType("integer");
 
@@ -208,14 +212,19 @@ namespace WareHaus.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("CurrentCapacity")
+                        .HasColumnType("integer");
+
                     b.Property<int>("CurrentVolume")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("MaxCapacity")
+                        .HasColumnType("integer");
+
                     b.Property<string>("QRCodePath")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 

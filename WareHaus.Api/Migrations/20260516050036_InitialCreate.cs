@@ -106,12 +106,14 @@ namespace WareHaus.Api.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ZoneId = table.Column<int>(type: "integer", nullable: false),
                     ShelfCode = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    ZoneId = table.Column<int>(type: "integer", nullable: false),
                     Aisle = table.Column<int>(type: "integer", nullable: false),
                     Capacity = table.Column<int>(type: "integer", nullable: false),
                     CurrentVolume = table.Column<int>(type: "integer", nullable: false),
-                    QRCodePath = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    QRCodePath = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    MaxCapacity = table.Column<int>(type: "integer", nullable: false),
+                    CurrentCapacity = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -124,7 +126,7 @@ namespace WareHaus.Api.Migrations
                         column: x => x.ZoneId,
                         principalTable: "Zones",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -138,6 +140,7 @@ namespace WareHaus.Api.Migrations
                     Condition = table.Column<string>(type: "text", nullable: false),
                     ReceivedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PhotoUrl = table.Column<string>(type: "text", nullable: false),
                     POItemsId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

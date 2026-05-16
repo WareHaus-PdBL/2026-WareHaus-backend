@@ -6,7 +6,7 @@ using WareHaus.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load("../.env");
+Env.Load(".env");
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
 
 builder.Services.AddOpenApi();

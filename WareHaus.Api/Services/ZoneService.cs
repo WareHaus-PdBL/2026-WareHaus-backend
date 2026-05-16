@@ -202,7 +202,9 @@ class ZoneService : IZoneService
     // Generate QR Code for Shelf
     private async Task<string> GenerateQRCodeAsync(string shelfCode, string zoneCode)
     {
-        string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "qrcodes", zoneCode);
+        string rootPath = _webHostEnvironment.WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot");
+
+        string folderPath = Path.Combine(rootPath, "qrcodes", zoneCode);
 
         if (!Directory.Exists(folderPath))
         {
