@@ -30,14 +30,19 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<GetProductDto>> CreateProductAsync(CreateProductDto createProductDto)
+    public async Task<ActionResult<GetProductDto>> CreateProductAsync(
+        [FromBody] CreateProductDto createProductDto
+    )
     {
         var product = await _productService.CreateProductAsync(createProductDto);
         return Ok(product);
     }
 
     [HttpPut("{productId}")]
-    public async Task<ActionResult<GetProductDto>> UpdateProductAsync(int productId, UpdateProductDto updateProductDto)
+    public async Task<ActionResult<GetProductDto>> UpdateProductAsync(
+        int productId,
+        [FromBody] UpdateProductDto updateProductDto
+    )
     {
         var product = await _productService.UpdateProductAsync(productId, updateProductDto);
         return Ok(product);
@@ -47,6 +52,61 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> DeleteProductAsync(int productId)
     {
         await _productService.DeleteProductAsync(productId);
+        return NoContent();
+    }
+
+    [HttpGet("{productId}/stock-locations")]
+    public async Task<ActionResult<List<GetProductStockLocationDto>>> GetProductStockLocationsAsync(
+        int productId
+    )
+    {
+        var stockLocations = await _productService.GetProductStockLocationsAsync(productId);
+        return Ok(stockLocations);
+    }
+
+    [HttpPost("stock-locations")]
+    public async Task<ActionResult<GetProductDetailDto>> AddProductStockLocationAsync(
+        [FromBody] AddProductStockLocationDto addStockLocationDto
+    )
+    {
+        var product = await _productService.AddProductStockLocationAsync(
+            addStockLocationDto
+        );
+
+        return Ok(product);
+    }
+
+    [HttpPut("stock-locations")]
+    public async Task<ActionResult<GetProductDetailDto>> UpdateProductStockLocationAsync(
+        [FromBody] UpdateProductStockLocationDto updateStockLocationDto
+    )
+    {
+        var product = await _productService.UpdateProductStockLocationAsync(
+            updateStockLocationDto
+        );
+
+        return Ok(product);
+    }
+
+    [HttpPost("stock-locations/move")]
+    public async Task<ActionResult<GetProductDetailDto>> MoveProductStockLocationAsync(
+        [FromBody] MoveProductStockLocationDto moveStockLocationDto
+    )
+    {
+        var product = await _productService.MoveProductStockLocationAsync(
+            moveStockLocationDto
+        );
+
+        return Ok(product);
+    }
+
+    [HttpDelete("{productId}/stock-locations/{shelfId}")]
+    public async Task<IActionResult> DeleteProductStockLocationAsync(
+        int productId,
+        int shelfId
+    )
+    {
+        await _productService.DeleteProductStockLocationAsync(productId, shelfId);
         return NoContent();
     }
 }

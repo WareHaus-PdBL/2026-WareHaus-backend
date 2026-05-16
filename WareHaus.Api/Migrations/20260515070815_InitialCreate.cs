@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WareHaus.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPhotoUrlToReceiving : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -106,12 +106,14 @@ namespace WareHaus.Api.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ZoneId = table.Column<int>(type: "integer", nullable: false),
                     ShelfCode = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    ZoneId = table.Column<int>(type: "integer", nullable: false),
                     Aisle = table.Column<int>(type: "integer", nullable: false),
                     Capacity = table.Column<int>(type: "integer", nullable: false),
                     CurrentVolume = table.Column<int>(type: "integer", nullable: false),
-                    QRCodePath = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    QRCodePath = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    MaxCapacity = table.Column<int>(type: "integer", nullable: false),
+                    CurrentCapacity = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -124,7 +126,7 @@ namespace WareHaus.Api.Migrations
                         column: x => x.ZoneId,
                         principalTable: "Zones",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -152,6 +154,38 @@ namespace WareHaus.Api.Migrations
                         column: x => x.POItemsId,
                         principalTable: "POItems",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProductId = table.Column<int>(type: "integer", nullable: false),
+                    ShelfId = table.Column<int>(type: "integer", nullable: false),
+                    MovementType = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    StockAfterMovement = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StockLogs_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StockLogs_Shelves_ShelfId",
+                        column: x => x.ShelfId,
+                        principalTable: "Shelves",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -222,6 +256,16 @@ namespace WareHaus.Api.Migrations
                 column: "ZoneId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StockLogs_ProductId",
+                table: "StockLogs",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockLogs_ShelfId",
+                table: "StockLogs",
+                column: "ShelfId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stocks_ProductId",
                 table: "Stocks",
                 column: "ProductId");
@@ -238,6 +282,9 @@ namespace WareHaus.Api.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ReceivingLogs");
+
+            migrationBuilder.DropTable(
+                name: "StockLogs");
 
             migrationBuilder.DropTable(
                 name: "Stocks");

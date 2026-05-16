@@ -25,24 +25,31 @@ public record GetDetailsZoneDto(
     List<GetShelfForZoneDto>? Shelves
 );
 
-public record CreateZoneDto(
-    [Required]
-    string ZoneCode,
-    [Required]
-    string ZoneName,
-    string Description,
-    string Category,
-    [Required, Range(1, int.MaxValue, ErrorMessage = "Lorong harus lebih dari 0.")]
-    int TotalAisle,
-    [Required, Range(1, int.MaxValue, ErrorMessage = "Rak per lorong harus lebih dari 0.")]
-    int ShelfPerAisle,
-    [Required, Range(1, int.MaxValue, ErrorMessage = "Kapasitas per rak harus lebih dari 0.")]
-    int CapacityPerShelf
-);
+public record CreateZoneDto
+{
+    [Required(ErrorMessage = "Zone code wajib diisi.")]
+    public string ZoneCode { get; init; } = string.Empty;
+
+    [Required(ErrorMessage = "Zone name wajib diisi.")]
+    public string ZoneName { get; init; } = string.Empty;
+
+    public string Description { get; init; } = string.Empty;
+
+    [Required(ErrorMessage = "Category wajib diisi.")]
+    public string Category { get; init; } = string.Empty;
+
+    [Range(1, int.MaxValue, ErrorMessage = "Total aisle harus lebih dari 0.")]
+    public int TotalAisle { get; init; }
+
+    [Range(1, int.MaxValue, ErrorMessage = "Shelf per aisle harus lebih dari 0.")]
+    public int ShelfPerAisle { get; init; }
+
+    [Range(1, int.MaxValue, ErrorMessage = "Capacity per shelf harus lebih dari 0.")]
+    public int CapacityPerShelf { get; init; }
+}
 
 public record UpdateZoneDto(
     string? ZoneName,
     string? Category,
     string? Description
 );
-

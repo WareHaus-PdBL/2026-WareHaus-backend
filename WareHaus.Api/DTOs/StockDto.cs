@@ -7,3 +7,11 @@ public record GetStockDto(
     int Quantity,
     GetShelfForZoneDto Shelf
 );
+
+public record GetStocksInShelfDto(
+    int Id,
+    int ShelfId,
+    int ProductId,
+    int Quantity,
+    GetProductDto Product
+);

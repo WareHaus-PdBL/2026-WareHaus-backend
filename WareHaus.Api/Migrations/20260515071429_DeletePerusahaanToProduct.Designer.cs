@@ -12,8 +12,8 @@ using WareHaus.Api.Data;
 namespace WareHaus.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260507021406_AddPhotoUrlToReceiving")]
-    partial class AddPhotoUrlToReceiving
+    [Migration("20260515071429_DeletePerusahaanToProduct")]
+    partial class DeletePerusahaanToProduct
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -212,14 +212,19 @@ namespace WareHaus.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("CurrentCapacity")
+                        .HasColumnType("integer");
+
                     b.Property<int>("CurrentVolume")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("MaxCapacity")
+                        .HasColumnType("integer");
+
                     b.Property<string>("QRCodePath")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -242,6 +247,49 @@ namespace WareHaus.Api.Migrations
                     b.HasIndex("ZoneId");
 
                     b.ToTable("Shelves");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.StockLogs", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MovementType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ShelfId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StockAfterMovement")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ShelfId");
+
+                    b.ToTable("StockLogs");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.Stocks", b =>
@@ -353,10 +401,29 @@ namespace WareHaus.Api.Migrations
                     b.HasOne("WareHaus.Api.Models.Zones", "Zones")
                         .WithMany("Shelves")
                         .HasForeignKey("ZoneId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Zones");
+                });
+
+            modelBuilder.Entity("WareHaus.Api.Models.StockLogs", b =>
+                {
+                    b.HasOne("WareHaus.Api.Models.Products", "Products")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WareHaus.Api.Models.Shelves", "Shelves")
+                        .WithMany()
+                        .HasForeignKey("ShelfId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Products");
+
+                    b.Navigation("Shelves");
                 });
 
             modelBuilder.Entity("WareHaus.Api.Models.Stocks", b =>
