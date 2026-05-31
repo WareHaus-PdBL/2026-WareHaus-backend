@@ -8,7 +8,19 @@ public class PackingTaskConfiguration : IEntityTypeConfiguration<PackingTasks>
 {
     public void Configure(EntityTypeBuilder<PackingTasks> builder)
     {
+        builder.ToTable("PackingTasks");
+
         builder.HasKey(task => task.Id);
+
+        builder.HasIndex(task => task.PackingNumber)
+            .IsUnique();
+
+        builder.Property(task => task.PackingNumber)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder.Property(task => task.SalesOrderId)
+            .IsRequired();
 
         builder.Property(task => task.TotalPackage)
             .IsRequired();
@@ -17,19 +29,21 @@ public class PackingTaskConfiguration : IEntityTypeConfiguration<PackingTasks>
             .HasMaxLength(30)
             .IsRequired();
 
-        builder.HasOne(task => task.SalesOrders)
+        builder.HasOne(task => task.SalesOrder)
             .WithMany(order => order.PackingTasks)
-            .HasForeignKey(task => task.SOId)
+            .HasForeignKey(task => task.SalesOrderId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(task => task.PackingItems)
-            .WithOne(item => item.PackingTasks)
+            .WithOne(item => item.PackingTask)
             .HasForeignKey(item => item.PackingTaskId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(task => task.Shipments)
-            .WithOne(shipment => shipment.PackingTasks)
+            .WithOne(shipment => shipment.PackingTask)
             .HasForeignKey(shipment => shipment.PackingTaskId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasQueryFilter(task => task.DeletedAt == null);
     }
 }

@@ -2,15 +2,19 @@ namespace WareHaus.Api.Models;
 
 public class SOItems : BaseEntities
 {
-    public int SOId { get; set; }
+    public int SalesOrderId { get; set; }
+
+    public SalesOrders? SalesOrder { get; set; }
 
     public int ProductId { get; set; }
+
+    public Products? Product { get; set; }
 
     public int QtyOrdered { get; set; }
 
     public int QtyPicked { get; set; }
 
-    public SalesOrders? SalesOrders { get; set; }
+    public int QtyVerified { get; set; }
 
-    public Products? Products { get; set; }
+    public string UnitOfMeasureSnapshot { get; set; } = string.Empty;
 }
