@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WareHaus.Api;
+namespace WareHaus.Api.Middleware;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {
-    private readonly IProblemDetailsService _problemDetailsService;
+    private readonly ILogger<GlobalExceptionHandler> _logger;
 
-    public GlobalExceptionHandler(IProblemDetailsService problemDetailsService)
+    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
     {
-        _problemDetailsService = problemDetailsService;
+        _logger = logger;
     }
 
     public async ValueTask<bool> TryHandleAsync(
@@ -17,43 +17,28 @@ public class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        var statusCode = StatusCodes.Status500InternalServerError;
-        var title = "Internal Server Error";
-        var detail = exception.Message;
-        IEnumerable<string> customErrors = new[] { exception.Message };
+        _logger.LogError(exception, "Terjadi error pada aplikasi.");
 
-        switch (exception)
+        var statusCode = exception switch
         {
-            case KeyNotFoundException:
-                statusCode = StatusCodes.Status404NotFound;
-                title = "Resource Not Found";
-                break;
-            case ArgumentException:
-                statusCode = StatusCodes.Status400BadRequest;
-                title = "Invalid Request";
-                break;
-            case UnauthorizedAccessException:
-                statusCode = StatusCodes.Status401Unauthorized;
-                title = "Unauthorized Access";
-                break;
-        }
-
-        httpContext.Response.StatusCode = statusCode;
+            KeyNotFoundException => StatusCodes.Status404NotFound,
+            InvalidOperationException => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError
+        };
 
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = title,
-            Detail = detail
+            Title = statusCode == StatusCodes.Status500InternalServerError
+                ? "Internal server error"
+                : "Request error",
+            Detail = exception.Message
         };
 
-        problemDetails.Extensions["errors"] = customErrors;
+        httpContext.Response.StatusCode = statusCode;
 
-        return await _problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-        {
-            HttpContext = httpContext,
-            ProblemDetails = problemDetails,
-            Exception = exception
-        });
+        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+
+        return true;
     }
 }

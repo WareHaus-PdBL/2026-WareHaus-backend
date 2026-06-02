@@ -250,7 +250,7 @@ public class OutboundService
                 throw new InvalidOperationException(
                     $"Stock product {soItem.Product?.ProductName ?? soItem.ProductId.ToString()} tidak cukup untuk dibuat Picking Task.");
             }
-        }
+        } 
 
         salesOrder.Status = OutboundStatus.Active;
 
