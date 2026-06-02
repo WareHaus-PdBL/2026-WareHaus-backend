@@ -718,7 +718,7 @@ public class OutboundService
                 ShelfCode = item.Shelf?.ShelfCode ?? string.Empty,
                 ZoneCode = item.Shelf?.Zones?.ZoneCode ?? string.Empty,
                 ZoneName = item.Shelf?.Zones?.ZoneName ?? string.Empty,
-                Aisle = ParseAisle(item.Shelf?.Aisle),
+                Aisle = item.Shelf?.Aisle ?? 0,
                 LocationSuggestion = item.LocationSuggestion,
                 QtyToPick = item.QtyToPick,
                 QtyPicked = item.QtyPicked,
@@ -802,20 +802,6 @@ public class OutboundService
         var zoneName = shelf.Zones?.ZoneName ?? "-";
 
         return $"Zone {zoneCode} ({zoneName}) - Aisle {shelf.Aisle} - Shelf {shelf.ShelfCode}";
-    }
-
-    private static int ParseAisle(string? aisle)
-    {
-        if (string.IsNullOrWhiteSpace(aisle))
-        {
-            return 0;
-        }
-
-        var digits = new string(aisle.Where(char.IsDigit).ToArray());
-
-        return int.TryParse(digits, out var result)
-            ? result
-            : 0;
     }
 
     private static void ValidateOutboundStatus(string status)

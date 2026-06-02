@@ -1,12 +1,11 @@
+using System;
+
 namespace WareHaus.Api.Models;
 
-public class BaseEntities
+public abstract class BaseEntities
 {
     public int Id { get; set; }
-
     public DateTime CreatedAt { get; set; }
-
     public DateTime UpdatedAt { get; set; }
-
     public DateTime? DeletedAt { get; set; }
 }
