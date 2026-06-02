@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WareHaus.Api;
+namespace WareHaus.Api.Middleware;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {
@@ -31,6 +31,10 @@ public class GlobalExceptionHandler : IExceptionHandler
             case ArgumentException:
                 statusCode = StatusCodes.Status400BadRequest;
                 title = "Invalid Request";
+                break;
+            case InvalidOperationException:
+                statusCode = StatusCodes.Status409Conflict;
+                title = "Conflict Detected";
                 break;
             case UnauthorizedAccessException:
                 statusCode = StatusCodes.Status401Unauthorized;
